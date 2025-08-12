@@ -1,10 +1,10 @@
 import 'package:api_project/API/movie_api.dart';
-import 'package:api_project/model/discover_movie_model.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:intl/intl.dart';
 import 'package:intl/intl.dart';
+
+import 'movie_play_screen.dart';
 
 class MoviesApp extends StatefulWidget {
   @override
@@ -12,8 +12,6 @@ class MoviesApp extends StatefulWidget {
 }
 
 class MoviesAppState extends State<MoviesApp> {
-  late Future<List<dynamic>> _allDataFuture;
-
   String formatDate(String rawDate) {
     final parsedDate = DateTime.tryParse(rawDate);
     if (parsedDate == null) return "Invalid date";
@@ -21,7 +19,7 @@ class MoviesAppState extends State<MoviesApp> {
   }
 
   late var count = 0;
-
+  late Future<List<dynamic>> _allDataFuture;
   void initState() {
     super.initState();
     _allDataFuture = Future.wait([
@@ -46,9 +44,8 @@ class MoviesAppState extends State<MoviesApp> {
               return Center(child: Text("Error: ${snapShot.error}"));
             }
             ;
-            var movies = snapShot.data![0].results ?? [] as List<Results>;
-            var discoverMovies =
-                snapShot.data![1].results ?? [] as List<discoverMovie>;
+            var movies = snapShot.data![0].results ?? [];
+            var discoverMovies = snapShot.data![1].results ?? [];
 
             List<dynamic> LatestMovies = movies
                 .map((m) => "https://image.tmdb.org/t/p/w500${m.posterPath}")
@@ -88,11 +85,15 @@ class MoviesAppState extends State<MoviesApp> {
                   ),
                 ),
                 SizedBox(height: 20),
-                sectionMovie(LatestMovies, "Latest Movies"),
+                sectionMovie(LatestMovies, "Latest Movies", "Latest Movies"),
                 // SizedBox(height: 20),
-                sectionMovie(PopularMovies, "Popular Movies"),
+                sectionMovie(PopularMovies, "Popular Movies", "Popular Movies"),
                 // SizedBox(height: 20),
-                sectionMovie(TopRatedMovies, "Top Rated Movies"),
+                sectionMovie(
+                  TopRatedMovies,
+                  "Top Rated Movies",
+                  "Top Rated Movies",
+                ),
               ],
             );
           },
@@ -101,7 +102,11 @@ class MoviesAppState extends State<MoviesApp> {
     );
   }
 
-  Widget sectionMovie(List<dynamic> moviesList, String? title) {
+  Widget sectionMovie(
+    List<dynamic> moviesList,
+    String? title,
+    String listName,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(left: 10),
       child: Column(
@@ -119,17 +124,28 @@ class MoviesAppState extends State<MoviesApp> {
               itemCount: moviesList.length,
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Image.network(
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Movies_Play_Screeen(
+                          index: index,
+                          listName: listName,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Hero(
+                    tag: "Movies",
+                    transitionOnUserGestures: true,
+                    child: Image.network(
                       moviesList[index],
                       width: 100.w,
                       height: 100.h,
                       fit: BoxFit.fill,
                     ),
-                  ],
+                  ),
                 );
               },
               separatorBuilder: (context, index) => SizedBox(width: 10.w),

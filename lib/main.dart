@@ -2,8 +2,8 @@ import 'package:api_project/newsapp.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'Screens/movie_app.dart';
 import 'Tv_show_screen.dart';
-import 'movie_app.dart';
 
 void main() {
   runApp(
