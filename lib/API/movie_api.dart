@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:api_project/model/discover_movie_model.dart';
 import 'package:http/http.dart' as http;
 
 import '../model/movie_model.dart';
@@ -14,6 +15,18 @@ class Movies_Api {
       final data = jsonDecode(response.body);
       print(data);
       return MoviesModel.fromJson(data);
+    } else {
+      throw Exception("Failed to load movies");
+    }
+  }
+
+  static Future<discoverMovie> fetchDiscoverMovies() async {
+    final url =
+        "https://api.themoviedb.org/3/discover/movie?api_key=2161dc6e0c1c24b144896c952175288e&language=en-US&sort_by=popularity.desc&page=1";
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return discoverMovie.fromJson(data);
     } else {
       throw Exception("Failed to load movies");
     }

@@ -1,4 +1,5 @@
 import 'package:api_project/API/movie_api.dart';
+import 'package:api_project/model/discover_movie_model.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +12,8 @@ class MoviesApp extends StatefulWidget {
 }
 
 class MoviesAppState extends State<MoviesApp> {
+  late Future<List<dynamic>> _allDataFuture;
+
   String formatDate(String rawDate) {
     final parsedDate = DateTime.tryParse(rawDate);
     if (parsedDate == null) return "Invalid date";
@@ -21,16 +24,21 @@ class MoviesAppState extends State<MoviesApp> {
 
   void initState() {
     super.initState();
-    Movies_Api.fetchMovies();
+    _allDataFuture = Future.wait([
+      Movies_Api.fetchMovies(),
+      Movies_Api.fetchDiscoverMovies(),
+    ]);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(" Aks Movies")),
+      appBar: AppBar(
+        title: Text(" Aks Movies", style: TextStyle(fontSize: 20.sp)),
+      ),
       body: SingleChildScrollView(
         child: FutureBuilder(
-          future: Movies_Api.fetchMovies(),
+          future: _allDataFuture,
           builder: (context, snapShot) {
             if (snapShot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -38,16 +46,18 @@ class MoviesAppState extends State<MoviesApp> {
               return Center(child: Text("Error: ${snapShot.error}"));
             }
             ;
-            var movies = snapShot.data!.results ?? [];
+            var movies = snapShot.data![0].results ?? [] as List<Results>;
+            var discoverMovies =
+                snapShot.data![1].results ?? [] as List<discoverMovie>;
 
-            List<String> LatestMovies = movies
+            List<dynamic> LatestMovies = movies
                 .map((m) => "https://image.tmdb.org/t/p/w500${m.posterPath}")
                 .toList();
 
-            List<String> PopularMovies = movies
+            List<dynamic> PopularMovies = discoverMovies
                 .map((m) => "https://image.tmdb.org/t/p/w500${m.posterPath}")
                 .toList();
-            List<String> TopRatedMovies = movies
+            List<dynamic> TopRatedMovies = movies
                 .map((m) => "https://image.tmdb.org/t/p/w500${m.posterPath}")
                 .toList();
 
@@ -91,7 +101,7 @@ class MoviesAppState extends State<MoviesApp> {
     );
   }
 
-  Widget sectionMovie(List<String> moviesList, String? title) {
+  Widget sectionMovie(List<dynamic> moviesList, String? title) {
     return Padding(
       padding: const EdgeInsets.only(left: 10),
       child: Column(
