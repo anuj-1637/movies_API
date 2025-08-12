@@ -42,12 +42,14 @@ class Movies_Play_ScreeenState extends State<Movies_Play_Screeen> {
           late String title;
           late String description;
           late String popularity;
+          late String rating;
           if (widget.listName == "Latest Movies") {
             imagurl =
                 "https://image.tmdb.org/t/p/w500${movies[widget.index].posterPath}";
             title = movies[widget.index].title!;
             description = movies[widget.index].overview!;
             popularity = movies[widget.index].popularity!.toStringAsFixed(1);
+            rating = movies[widget.index].voteAverage!.toStringAsFixed(1);
           } else if (widget.listName == "Popular Movies") {
             imagurl =
                 "https://image.tmdb.org/t/p/w500${discoverMovies[widget.index].posterPath}";
@@ -55,12 +57,16 @@ class Movies_Play_ScreeenState extends State<Movies_Play_Screeen> {
             description = discoverMovies[widget.index].overview!;
             popularity = discoverMovies[widget.index].popularity!
                 .toStringAsFixed(1);
+            rating = discoverMovies[widget.index].voteAverage!.toStringAsFixed(
+              1,
+            );
           } else if (widget.listName == "Top Rated Movies") {
             imagurl =
                 "https://image.tmdb.org/t/p/w500${movies[widget.index].posterPath}";
             title = movies[widget.index].title!;
             description = movies[widget.index].overview!;
             popularity = movies[widget.index].popularity!.toStringAsFixed(1);
+            rating = movies[widget.index].voteAverage!.toStringAsFixed(1);
           }
 
           return Column(
@@ -94,7 +100,17 @@ class Movies_Play_ScreeenState extends State<Movies_Play_Screeen> {
                   'Popularity: $popularity',
                   style: TextStyle(fontSize: 14.sp),
                 ),
+                // SizedBox(height: 10),
               ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Rating: $rating',
+                  style: TextStyle(fontSize: 14.sp),
+                ),
+                // SizedBox(height: 10),
+              ),
+              SizedBox(height: 10),
             ],
           );
         },
